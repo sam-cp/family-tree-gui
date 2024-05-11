@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://familytree.samprewett.com/familytree.xsd" xmlns:ftr="https://familytree.samprewett.com/familytree.xsd" elementFormDefault="qualified">
+    <xs:element name="familytree">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="male" type="ftr:maletype"/>
+                <xs:element name="female" type="ftr:femaletype"/>
+            </xs:choice>
+        </xs:complexType>
+
+        <xs:unique name="uuidunique">
+            <xs:selector xpath=".//ftr:male | .//ftr:female"/>
+            <xs:field xpath="@uuid"/>
+        </xs:unique>
+        <xs:key name="uuidkeymale">
+            <xs:selector xpath=".//ftr:male"/>
+            <xs:field xpath="@uuid"/>
+        </xs:key>
+        <xs:key name="uuidkeyfemale">
+            <xs:selector xpath=".//ftr:female"/>
+            <xs:field xpath="@uuid"/>
+        </xs:key>
+        <xs:keyref name="uuidkeyrefmale" refer="ftr:uuidkeymale">
+            <xs:selector xpath=".//ftr:father | .//ftr:husband"/>
+            <xs:field xpath="@uuid"/>
+        </xs:keyref>
+        <xs:keyref name="uuidkeyreffemale" refer="ftr:uuidkeyfemale">
+            <xs:selector xpath=".//ftr:mother"/>
+            <xs:field xpath="@uuid"/>
+        </xs:keyref>
+        <xs:unique name="uuiduniquehusband">
+            <xs:selector xpath=".//ftr:husband"/>
+            <xs:field xpath="@uuid"/>
+        </xs:unique>
+    </xs:element>
+
+    <xs:complexType name="maletype">
+        <xs:all>
+            <xs:element name="name" type="ftr:nametype"/>
+            <xs:element name="family">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="father" type="ftr:relative" minOccurs="0"/>
+                        <xs:element name="mother" type="ftr:relative" minOccurs="0"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="notes" type="xs:string" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="uuid" type="ftr:uuidtype" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="femaletype">
+        <xs:all>
+            <xs:element name="name" type="ftr:nametype"/>
+            <xs:element name="family">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="father" type="ftr:relative" minOccurs="0"/>
+                        <xs:element name="mother" type="ftr:relative" minOccurs="0"/>
+                        <xs:element name="husband" type="ftr:relative" minOccurs="0"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="notes" type="xs:string" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="uuid" type="ftr:uuidtype" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="nametype">
+        <xs:all>
+            <xs:element name="firstname" type="xs:string" minOccurs="0"/>
+            <xs:element name="middlename" type="xs:string" minOccurs="0"/>
+            <xs:element name="lastname" type="xs:string"/>
+            <xs:element name="preferredname" type="xs:string" minOccurs="0"/>
+            <xs:element name="maidenname" type="xs:string" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:simpleType name="uuidtype">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="relative">
+        <xs:attribute name="uuid" type="ftr:uuidtype" use="required"/>
+    </xs:complexType>
+</xs:schema>
